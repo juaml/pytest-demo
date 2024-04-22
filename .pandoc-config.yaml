@@ -1,0 +1,18 @@
+---
+title: "Using Pytest in a Research Project"
+author: "Leonard Sasse & Synchon Mandal"
+date: \today
+
+documentclass: beamer
+classoption:
+- aspectratio=169
+
+header-includes: |
+
+  \usepackage{soul}
+  \usepackage{xcolor}
+  \usepackage[dvipsnames]{}
+  \usepackage[left]{lineno}
+  \usepackage{listings}
+
+---
