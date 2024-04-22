@@ -109,7 +109,7 @@ We can run these tests all at once using `pytest` which will tell us if
 they pass or fail.
 
 ``` sh
-pytest tests/
+pytest src/tests/
 ```
 
 <div class="columns">
