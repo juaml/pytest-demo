@@ -1,3 +1,5 @@
+# Introduction: What’s the problem?
+
 ## 
 
 > “Program testing can be a very effective way to show the presence of
@@ -6,7 +8,7 @@
 > — <cite>[Edsger W. Dijkstra, “The Humble Programmer”
 > (1972)](https://www.cs.utexas.edu/~EWD/transcriptions/EWD03xx/EWD340.html)</cite>
 
-## Imagine You Write a Simple Function
+## Imagine you write a simple function
 
 ``` python
 def add(a, b):
@@ -16,7 +18,7 @@ def add(a, b):
 
 How do we know that this is correct?
 
-## Testing our New Function
+## Testing our new function
 
 We can go to the REPL and run the code! For example, we know that
 $2 + 2 = 4$:
@@ -34,7 +36,7 @@ and then:
 
 Seems like our function is doing the right thing!
 
-## Testing a Script
+## Testing a script
 
 We can test whether a script is running and producing the correct
 output:
@@ -77,7 +79,7 @@ if __name__ == "__main__":
 
 </div>
 
-## Run The Script and Inspect the Output
+## Run the script and inspect the output
 
 ``` sh
 python3 model.py
@@ -99,9 +101,9 @@ f(8) = 10.6
 f(9) = 11.3
 ```
 
-## What is the Problem with this Approach?
+## What is the problem with this approach?
 
-## What is the Problem with this Approach
+## What is the problem with this approach
 
 - As projects grow, manually re-testing every script is tedious and
   error prone.
@@ -111,14 +113,51 @@ f(9) = 11.3
   - Bugs may only appear for certain edge cases but we are not really
     searching for those
 
-## Instead using REPL or running the Script, we can automate the Testing
+# Instead of using REPL or running the script manually, we can automate the testing
+
+## How to write tests
+
+1.  Set up any needed data or state.
+2.  Run the code you want to test.
+3.  Assert the results are what you expect.
+
+## Basic project set up
+
+- This is only a folder structure to showcase a basic, minimal pytest
+  example.
+- This is NOT an example of how a project SHOULD be organised.
+- It is purely intended to demonstrate how pytest can be made
+  functional.
+
+<figure>
+<img src="assets/tree.png" alt="Demo tree" />
+<figcaption aria-hidden="true">Demo tree</figcaption>
+</figure>
+
+## Doing a python project? Make a **pyproject.toml**!
+
+``` toml
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = "src/tests"
+log_cli_level = "INFO"
+xfail_strict = true
+addopts = [
+    "-ra",
+    "--strict-config",
+    "--strict-markers",
+    "-vvv",
+]
+```
+
+## Run from the **root** of your **project**:
 
 We can run these tests all at once using `pytest` which will tell us if
 they pass or fail.
 
 ``` sh
 pip install pytest
-pytest src/tests/
+pytest
 ```
 
 <div class="columns">
@@ -170,7 +209,7 @@ def add(a, b):
 ```
 
 ``` sh
-pytest src/tests/
+pytest
 ```
 
 </div>
@@ -186,7 +225,9 @@ pytest src/tests/
 
 </div>
 
-## We can get a Report on line coverage using the `pytest-cov` plugin
+# Useful pytest plugins
+
+## We can get a report on line coverage using the `pytest-cov` plugin
 
 ``` sh
 pip install pytest-cov
@@ -195,7 +236,7 @@ pip install pytest-cov
 From the repository root run:
 
 ``` sh
-pytest src/tests/ --cov=src
+pytest --cov=src
 ```
 
 <figure>
@@ -208,7 +249,7 @@ pytest src/tests/ --cov=src
 From the repository root run:
 
 ``` sh
-pytest src/tests/ --cov=src --cov-report term-missing
+pytest --cov=src --cov-report term-missing
 ```
 
 <figure>
@@ -217,7 +258,7 @@ alt="coverage term missing" />
 <figcaption aria-hidden="true">coverage term missing</figcaption>
 </figure>
 
-## Lastly, for long test suites: Use ALL the cores!
+## For long test suites: Use ALL the cores!
 
 If you have lots of tests and they take some time you can use
 `pytest-xdist` which will run tests in parallel when you use the `-n`
@@ -225,7 +266,7 @@ flag:
 
 ``` sh
 pip install pytest-xdist
-pytest src/tests/ --cov=src --cov-report term-missing -n 16
+pytest --cov=src --cov-report term-missing -n 16
 ```
 
 Note, that in our example this will run slower since we only have two
@@ -233,61 +274,7 @@ functions and the parallelising overhead is not really worth it. But if
 your tests are running longer than a few seconds, this will likely
 already be worth it.
 
-## A Note On Importing Your Functions to a Test Module
-
-Importing python modules can be tricky. Pytest uses the `__init__.py` to
-realise that the test module is part of a python package and can use
-init files to find the necessary imports, so make sure not to forget
-them if you are using relative imports in your test files. The `tree`
-for our example repo looks like that:
-
-<figure>
-<img src="assets/init.png" width="250" alt="innit" />
-<figcaption aria-hidden="true">innit</figcaption>
-</figure>
-
-## Importing your Modules to Test Files
-
-``` python
-import sys
-from pathlib import Path
-
-# The import is a bit messier and could simply
-# be:
-# from ..model import add, mul, predict
-# if we only wanted to use pytest.
-# The below import also enables us to directly
-# run tests without packaging and installing our
-# project if we ever want to do that.
-src = Path(__file__).parents[0] / ".." / "."
-print(src)
-sys.path.append(str(src))
-```
-
-## Packaging your Project
-
-- if you have a medium/large sized folder of files with code that is
-  shared by different executables, you probably want to properly package
-  it (by that I only mean making the local project installable via pip,
-  NOT necessarily publishing on [PyPI](https://pypi.org/))
-  - see [Publishing a Python
-    Package](https://realpython.com/pypi-publish-python-package/)
-  - see [Video on packaging with historical
-    context](https://pyvideo.org/pycon-uk-2019/what-does-pep-517-mean-for-packaging.html)
-- python/pytest `import` f\*\*\*ery can be quite confusing
-  - see [Pytest: Good Integration
-    Practices](https://docs.pytest.org/en/7.1.x/explanation/goodpractices.html)
-  - see [Blog post on package layout and problems it can induce to
-    python/pytest import
-    f\*\*\*ery](https://blog.ionelmc.ro/2014/05/25/python-packaging/#the-structure%3E)
-- if your project is packaged and you want to specifically test the
-  installed version rather than local modules available in your
-  `$PYTHONPATH`, you may want to look into using
-  [tox](https://tox.wiki/en/stable/index.html)
-- **The main point here is that you do NOT need to properly package your
-  project in order to write and run tests with pytest. You can do this
-  easily with any project you already have that defines any functions or
-  classes you can import elsewhere.**
+# Testing your tests: How good are my tests?
 
 ## What do you think about these tests?
 
@@ -321,7 +308,7 @@ def test_mul():
 
 </div>
 
-## Consider this Bug:
+## Consider this bug:
 
 <div class="columns">
 
@@ -354,9 +341,10 @@ def test_mul():
 </div>
 
 The behaviour of the functions has completely changed, but the tests
-will pass, so we might think all is well!
+will pass, so we might think all is well! (Remember the quote from the
+beginning?)
 
-## Mutation Testing
+## Mutation testing
 
 This is precisely what mutation testing does: It takes your code and
 creates mutated variants of your code. It will then run your tests to
@@ -403,8 +391,109 @@ def test_add():
 | [mut.py fork](https://github.com/se2p/mutpy-pynguin) | Was forked because mut.py was not actively maintained | Also not actively maintained                                              |
 |                                                      |                                                       |                                                                           |
 
+# A nicer way of testing multiple inputs
+
+## Parametrise Tests
+
+- Previously we called our function multiple times with different inputs
+- Pytest allows us something nicer, by parametrising test functions
+  using a decorator
+
+## Addition Example
+
+``` python
+@pytest.mark.parametrize(
+    "a,b,expected_result",
+    [(2, 2, 4), (1, 2, 3), (5, 5, 10), (2, 4, 6), (100, 100, 200)],
+)
+def test_add(a, b, expected_result):
+    result = add(a, b)
+    assert result == expected_result
+```
+
+## Multiplication Example
+
+``` python
+@pytest.mark.parametrize(
+    "a,b,expected_result",
+    [(2, 2, 4), (1, 2, 2), (5, 5, 25), (2, 4, 8), (100, 100, 10000)],
+)
+def test_mul(a, b, expected_result):
+    result = mul(a, b)
+    assert result == expected_result
+```
+
+## 
+
+<figure>
+<img src="assets/pytest-parametrise.png" alt="Parametrised output" />
+<figcaption aria-hidden="true">Parametrised output</figcaption>
+</figure>
+
+# Equality of floats
+
+## 
+
+- see [Floating Point Arithmetic: Issues and
+  Limitations](https://docs.python.org/3/tutorial/floatingpoint.html#floating-point-arithmetic-issues-and-limitations)
+
+``` python
+def test_add_array():
+    a = np.arange(9).reshape(3, 3).astype(float)
+    b = np.arange(10, 19).reshape(3, 3).astype(float)
+    result = add(a, b)
+    expected_result = np.array(
+        [[10.0, 12.0, 14.0], [16.0, 18.0, 20.0], [22.0, 24.0, 26.0]],
+    )
+    assert result == pytest.approx(expected_result)
+```
+
+# Imports and packaging
+
+## Importing your modules to test files
+
+``` python
+import sys
+from pathlib import Path
+import pytest
+import numpy as np
+
+src = Path(__file__).parents[0] / ".." / "."
+print(src)
+sys.path.append(str(src))
+
+from model import add, mul, predict
+```
+
+## Packaging your Project
+
+- if you have a medium/large sized folder of files with code that is
+  shared by different executables, you probably want to properly package
+  it (by that I only mean making the local project installable via pip,
+  NOT necessarily publishing on [PyPI](https://pypi.org/))
+  - see [Publishing a Python
+    Package](https://realpython.com/pypi-publish-python-package/)
+  - see [Video on packaging with historical
+    context](https://pyvideo.org/pycon-uk-2019/what-does-pep-517-mean-for-packaging.html)
+- python/pytest `import` f\*\*\*ery can be quite confusing
+  - see [Pytest: Good Integration
+    Practices](https://docs.pytest.org/en/7.1.x/explanation/goodpractices.html)
+  - see [Blog post on package layout and problems it can induce to
+    python/pytest import
+    f\*\*\*ery](https://blog.ionelmc.ro/2014/05/25/python-packaging/#the-structure%3E)
+- if your project is packaged and you want to specifically test the
+  installed version rather than local modules available in your
+  `$PYTHONPATH`, you may want to look into using
+  [tox](https://tox.wiki/en/stable/index.html)
+- **The main point here is that you do NOT need to properly package your
+  project in order to write and run tests with pytest. You can do this
+  easily with any project you already have that defines any functions or
+  classes you can import elsewhere.**
+
 ## A bunch of other potentially useful links and ressources:
 
-[Use Pytest Approx to for Numerical Accuracy a.k.a don’t simply test
-equality of
-floats](https://pytest-with-eric.com/pytest-advanced/pytest-approx/)
+1.  [Use Pytest Approx to for Numerical Accuracy a.k.a don’t simply test
+    equality of
+    floats](https://pytest-with-eric.com/pytest-advanced/pytest-approx/)
+
+2.  [Scientific Python](https://scientific-python.org/)

@@ -2,8 +2,11 @@
 
 pandoc .pandoc-config.yaml slides.md \
   -t beamer \
-  -V theme:Madrid \
+  -V theme:Boadilla \
   --highlight-style=tango \
-  -o slides.pdf
+  --toc \
+  -o slides.pdf 
 
 pandoc slides.md -t gfm -o README.md
+
+
