@@ -3,6 +3,9 @@ title: "Using Pytest in a Research Project"
 author: "Leonard Sasse & Synchon Mandal"
 date: \today
 
+colorlinks: true
+# links-as-notes: true
+
 documentclass: beamer
 classoption:
 - aspectratio=169
