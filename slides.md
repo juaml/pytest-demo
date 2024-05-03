@@ -1,7 +1,7 @@
 
 # Introduction: What's the problem?
 
-## 
+### 
 
 > "Program testing can be a very effective way to show the presence of bugs,
 > but it is hopelessly inadequate for showing their absence."
@@ -10,7 +10,7 @@
 
 [1]: https://www.cs.utexas.edu/~EWD/transcriptions/EWD03xx/EWD340.html
 
-## Imagine you write a simple function
+### Imagine you write a simple function
 
 
 ```python
@@ -24,7 +24,7 @@ def add(a, b):
 How do we know that this is correct?
 
 
-## Testing our new function
+### Testing our new function
 
 We can go to the REPL and run the code!
 For example, we know that $2 + 2 = 4$:
@@ -39,7 +39,7 @@ and then:
 ```
 Seems like our function is doing the right thing!
 
-## Testing a script
+### Testing a script
 
 We can test whether a script is running and producing the correct output:
 
@@ -79,7 +79,7 @@ if __name__ == "__main__":
 ::::
 :::::::
 
-## Run the script and inspect the output
+### Run the script and inspect the output
 
 ```sh
 python3 model.py
@@ -100,24 +100,24 @@ f(8) = 10.6
 f(9) = 11.3
 ```
 
-## What is the problem with this approach?
+### What is the problem with this approach?
 
-## What is the problem with this approach
+### What is the problem with this approach
 
 * As projects grow, manually re-testing every script is tedious and error prone.
 * We forget manual tests that we have done in the past and don't do it again
 * We are testing a very limited set of inputs
   * Bugs may only appear for certain edge cases but we are not really searching for those
 
-# Instead of using REPL or running the script manually, we can automate the testing
+# We can automate the testing
 
-## How to write tests
+### How to write tests
 
 1. Set up any needed data or state.
 2. Run the code you want to test.
 3. Assert the results are what you expect.
 
-## Basic project set up
+### Basic project set up
 
 * This is only a folder structure to showcase a basic, minimal pytest example. 
 * This is NOT an example of how a project SHOULD be organised.
@@ -125,7 +125,7 @@ f(9) = 11.3
 
 ![Demo tree](assets/tree.png)
 
-## Doing a python project? Make a **pyproject.toml**!
+### Doing a python project? Make a **pyproject.toml**!
 
 ```toml
 [tool.pytest.ini_options]
@@ -141,7 +141,7 @@ addopts = [
 ]
 ```
 
-## Run from the **root** of your **project**:
+### Run from the **root** of your **project**:
 
 We can run these tests all at once using `pytest` which will
 tell us if they pass or fail.
@@ -177,11 +177,11 @@ def test_mul():
 ::::
 :::
 
-## Pass
+### Pass
 
 ![PASSED](assets/pytest.png)
 
-## Introduce a bug:
+### Introduce a bug:
 
 ::: {.columns}
 :::: {.column}
@@ -204,7 +204,7 @@ pytest
 
 # Useful pytest plugins
 
-## We can get a report on line coverage using the `pytest-cov` plugin
+### We can get a report on line coverage using the `pytest-cov` plugin
 
 ```sh
 pip install pytest-cov
@@ -216,7 +216,7 @@ pytest --cov=src
 
 ![coverage](assets/pytest-cov.png){ width=250px }
 
-## We can also see which lines in our code are not executed in tests:
+### We can also see which lines in our code are not executed in tests:
 
 From the repository root run:
 ```sh
@@ -224,7 +224,7 @@ pytest --cov=src --cov-report term-missing
 ```
 ![coverage term missing](assets/pytest-cov_term_missing.png)
 
-## For long test suites: Use ALL the cores!
+### For long test suites: Use ALL the cores!
 
 If you have lots of tests and they take some time you
 can use `pytest-xdist` which will run tests in parallel when
@@ -241,7 +241,7 @@ longer than a few seconds, this will likely already be worth it.
 
 # Testing your tests: How good are my tests?
 
-## What do you think about these tests?
+### What do you think about these tests?
 
 ::: {.columns}
 :::: {.column}
@@ -269,7 +269,7 @@ def test_mul():
 ::::
 :::
 
-## Consider this bug:
+### Consider this bug:
 
 ::: {.columns}
 :::: {.column}
@@ -300,7 +300,7 @@ def test_mul():
 The behaviour of the functions has completely changed,
 but the tests will pass, so we might think all is well! (Remember the quote from the beginning?)
 
-## Mutation testing
+### Mutation testing
 
 This is precisely what mutation testing does: It takes your code and creates
 mutated variants of your code. It will then run your tests
@@ -332,7 +332,7 @@ def test_add():
 ::::
 :::
 
-## Mutation Testing in Python
+### Mutation Testing in Python
 
 | Name/Link                                            | Pros                                                  | Cons                                                                      |
 |------------------------------------------------------|-------------------------------------------------------|---------------------------------------------------------------------------|
@@ -342,14 +342,14 @@ def test_add():
 | [mut.py fork](https://github.com/se2p/mutpy-pynguin) | Was forked because mut.py was not actively maintained | Also not actively maintained                                              |
 |                                                      |                                                       |                                                                           |
 
-# A nicer way of testing multiple inputs
+# Some additional features/pitfalls to consider when testing
 
-## Parametrise Tests
+### Feature: A nicer way of testing multiple inputs
 
 * Previously we called our function multiple times with different inputs
 * Pytest allows us something nicer, by parametrising test functions using a decorator
 
-## Addition Example
+### Addition Example
 
 ```python
 @pytest.mark.parametrize(
@@ -361,7 +361,7 @@ def test_add(a, b, expected_result):
     assert result == expected_result
 ```
 
-## Multiplication Example
+### Multiplication Example
 
 ```python
 @pytest.mark.parametrize(
@@ -373,13 +373,62 @@ def test_mul(a, b, expected_result):
     assert result == expected_result
 ```
 
-##
+###
 
 ![Parametrised output](assets/pytest-parametrise.png)
 
-# Equality of floats
 
-## 
+### Feature: Check that your program is raising errors 
+
+We want to test that this function raises an error if the input is in a bad state:
+```python
+def add(a, b):
+    if isinstance(a, str) or isinstance(b, str):
+        raise ValueError("Adding of strings not allowed!")
+		
+    return a + b
+```
+We can use `parametrize` to create multiple inputs with bad states, and `pytest.raises`
+to assert that the correct error is raised:
+```python
+@pytest.mark.parametrize("a,b", [(5, "6"), ("5", 6), ("5", "6")])
+def test_add_error(a, b):
+    with pytest.raises(ValueError, match="Adding of strings not allowed!"):
+        add(a, b)
+
+```
+
+###
+
+![pytest.raises passes](assets/raises-pass.png)
+
+###
+
+Imagine that in some commit for whatever reason we accidentally change this:
+```python
+def add(a, b):
+    if isinstance(a, str) or isinstance(b, str):
+        raise ValueError("Adding of strings not allowed!")
+		
+    return a + b
+```
+To this:
+```python
+def add(a, b):
+    if isinstance(a, str):
+        raise ValueError("Adding of strings not allowed!")
+		
+    return a + b
+```
+
+### 
+
+Our tests will then fail when `b` is in a bad state, since we don't get the
+error that we expected:
+
+![pytest.raises fails](assets/raises-fail.png)
+
+### Pitfall and feature: Equality of floats
 
 * see [Floating Point Arithmetic: Issues and Limitations](https://docs.python.org/3/tutorial/floatingpoint.html#floating-point-arithmetic-issues-and-limitations)
 
@@ -394,9 +443,9 @@ def test_add_array():
     assert result == pytest.approx(expected_result)
 ```
 
-# Imports and packaging
+### Pitfall: Imports and packaging
 
-## Importing your modules to test files
+
 
 ```python
 import sys
@@ -411,8 +460,8 @@ sys.path.append(str(src))
 from model import add, mul, predict
 ```
 
-## Packaging your Project
-
+### Packaging your Project
+ 
 * if you have a medium/large sized folder of files with
 code that is shared by different executables, you probably
 want to properly package it (by that I only mean making the local project
@@ -429,7 +478,7 @@ in order to write and run tests with pytest. You can do this easily with any pro
 that defines any functions or classes you can import elsewhere.**
 
 
-## A bunch of other potentially useful links and ressources:
+### A bunch of other potentially useful links and ressources:
  
 
 1. [Use Pytest Approx to for Numerical Accuracy a.k.a don't simply test equality

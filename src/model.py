@@ -3,6 +3,9 @@
 
 def add(a, b):
     """Add two values."""
+    if isinstance(a, str) or isinstance(b, str):
+        raise ValueError("Adding of strings not allowed!")
+
     return a + b
 
 
